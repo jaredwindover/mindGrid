@@ -1,11 +1,16 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from BridgeConceptGraph import BridgeConceptGraph
+from cursor import Cursor
 
 class ViewingWindow(QWidget):
     def __init__(self,*args):
         super(ViewingWindow,self).__init__(*args)
         self.graph = BridgeConceptGraph()
+        self.cursor = Cursor()
+        self.cursor.leftClick.connect(self.onLeftClick)
+        self.cursor.hover.connect(self.onHover)
+        self.cursor.leftDrag.connect(self.onLeftDrag)
         self.initUI()
 
     def initUI(self):
@@ -70,3 +75,20 @@ class ViewingWindow(QWidget):
     def setGraph(self,graph):
         self.graph = graph
         
+    def mousePressEvent(self,event):
+        self.cursor.update(event,'p')
+        
+    def mouseReleaseEvent(self,event):
+        self.cursor.update(event,'r')
+        
+    def mouseMoveEvent(self,event):
+        self.cursor.update(event,'m')
+
+    def onLeftClick(self):
+        pass
+
+    def onLeftDrag(self):
+        pass
+
+    def onHover(self):
+        pass
