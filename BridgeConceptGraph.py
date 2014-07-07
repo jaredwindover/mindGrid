@@ -18,7 +18,7 @@ class BridgeConceptGraph:
         self.ReverseEdges[k] = []
         return k
 
-    def AddConcept(self,bridge):
+    def AddConcept(self,concept):
         k = self.GetNextKey()
         self.concepts[k] = concept
         self.ForwardEdges[k] = []
@@ -30,7 +30,7 @@ class BridgeConceptGraph:
             return self.freedKeys.pop()
         except:
             k = self.lastKey
-            self.lastKey = baseKey.increment(self.lastKey)
+            self.lastKey = self.baseKey.increment(self.lastKey)
             return k
 
     def ConnectBridgeToConcept(self, iBridge, iConcept):

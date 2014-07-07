@@ -1,3 +1,4 @@
+from PyQt4.QtCore import *
 from SignalSlotObject import SignalSlotObject
 
 ###
@@ -14,7 +15,7 @@ class Cursor():
         self._py = 0
         self.leftDown = False
         self.rightDown = False
-        self.midDown = False
+        self.middleDown = False
         self.leftClickOnRelease = False
         self.rightClickOnRelease = False
         self.middleClickOnRelease = False
@@ -26,7 +27,7 @@ class Cursor():
         self.leftDrag = SignalSlotObject()
         self.rightDrag = SignalSlotObject()
         self.middleDrag = SignalSlotObject()
-        self.drag = SignalSLotObject()
+        self.drag = SignalSlotObject()
         
     def setX(self,a):
         if self.x != a:
@@ -47,7 +48,7 @@ class Cursor():
         self.rightDown = (a == 1)
         b = (b - a) / 2
         a = b % 2
-        self.midDown = (a == 1)
+        self.middleDown = (a == 1)
 
     def update(self,e,prm='o'):
         self.setX(e.x())

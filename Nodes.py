@@ -23,18 +23,20 @@ class Node:
 
 class Bridge(Node):
     def __init__(self):
-        super(Bridge,self).__init__('Default Bridge',
-                                    DEFAULT_TEXT,
-                                    QColor(0,255,255),
-                                    QColor(0,255,0),
-                                    30
+        Node.__init__(self,
+                      'Default Bridge',
+                      DEFAULT_TEXT,
+                      QColor(0,255,255),
+                      QColor(0,255,0),
+                      30
         )
     
 class Concept(Node):
     def __init__(self):
-        super(Concept,self).__init__('Default Concept',
-                                     DEFAULT_TEXT,
-                                     QColor(255,0,255),
-                                     QColor(255,0,0),
-                                     30
+        Node.__init__(self,
+                      'Default Concept',
+                      DEFAULT_TEXT,
+                      QColor(255,0,255),
+                      QColor(255,0,0),
+                      30
         )

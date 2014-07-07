@@ -34,15 +34,19 @@ class ViewingWindow(QWidget):
 
     def drawGraph(self, qp):
         for bridge in self.graph.bridges:
-            drawBridgeToConceptEdges(qp,bridge, bridge.ForwardEdges)
+            self.drawBridgeToConceptEdges(qp,
+                                          self.graph.bridges[bridge],
+                                          self.graph.ForwardEdges[bridge])
         for concept in self.graph.concepts:
-            drawConceptToBridgeEdges(qp,concept, concept.ForwardEdges)
+            self.drawConceptToBridgeEdges(qp,
+                                          self.graph.concepts[concept],
+                                          self.graph.ForwardEdges[concept])
         for bridge in self.graph.bridges:
-            drawBridge(qp,bridge)
+            self.drawBridge(qp,self.graph.bridges[bridge])
         for conept in self.graph.concepts:
-            drawConcept(qp,concept)
+            self.drawConcept(qp,self.graph.concepts[concept])
 
-    def drawBridgeToConceptEdges(self,bridge,qp,edges):
+    def drawBridgeToConceptEdges(self,qp,bridge,edges):
         pen = QPen()
         brush = QBrush()
         qp.setPen(pen)
@@ -50,7 +54,7 @@ class ViewingWindow(QWidget):
         for e in edges:
             qp.drawLine(bridge.position,self.graph.concepts[e].position)
             
-    def drawConceptToBridgeEdges(self,concept,qp,edges):
+    def drawConceptToBridgeEdges(self,qp,concept,edges):
         pen = QPen()
         brush = QBrush()
         qp.setPen(pen)
@@ -65,12 +69,12 @@ class ViewingWindow(QWidget):
         qp.setBrush(brush)
         qp.drawEllipse(bridge.position,bridge.radius,bridge.radius)
         
-    def drawEdge(self,qp,edge):
+    def drawConcept(self,qp,concept):
         pen = QPen()
         brush = QBrush()
         qp.setPen(pen)
         qp.setBrush(brush)
-        qp.drawEllipse(bridge.position,bridge.radius,bridge.radius)
+        qp.drawEllipse(concept.position,concept.radius,concept.radius)
 
     def setGraph(self,graph):
         self.graph = graph
