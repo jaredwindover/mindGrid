@@ -19,9 +19,15 @@ class Cursor():
         self.leftClickOnRelease = False
         self.rightClickOnRelease = False
         self.middleClickOnRelease = False
+        self.leftPress = SignalSlotObject()
+        self.rightPress = SignalSlotObject()
+        self.middlePress = SignalSlotObject()
         self.leftClick = SignalSlotObject()
         self.rightClick = SignalSlotObject()
         self.middleClick = SignalSlotObject()
+        self.leftRelease = SignalSlotObject()
+        self.rightRelease = SignalSlotObject()
+        self.middleRelease = SignalSlotObject()
         self.click = SignalSlotObject()
         self.hover = SignalSlotObject()
         self.leftDrag = SignalSlotObject()
@@ -58,31 +64,43 @@ class Cursor():
         if prm == 'p':
             if e.button() == Qt.LeftButton:
                 self.leftClickOnRelease = True
+                self.leftPress.emit()
             elif e.button() == Qt.RightButton:
                 self.rightClickOnRelease = True
+                self.rightPress.emit()
             elif e.button() == Qt.MiddleButton:
                 self.middleClickOnRelease = True
+                self.middlePress.emit()
         elif prm == 'r':
-            if e.button() == Qt.LeftButton and self.leftClickOnRelease:
-                self.leftClick.emit()
-                self.click.emit()
-            elif e.button() == Qt.RightButton and self.rightClickOnRelease:
-                self.rightClick.emit()
-                self.click.emit()
-            elif e.button() == Qt.MiddleButton and self.middleClickOnRelease:
-                self.middleClick.emit()
-                self.click.emit()
+            if e.button() == Qt.LeftButton:
+                self.leftRelease.emit()
+                if self.leftClickOnRelease:
+                    self.leftClick.emit()
+                    self.click.emit()
+            elif e.button() == Qt.RightButton:
+                self.rightRelease.emit()
+                if self.rightClickOnRelease:
+                    self.rightClick.emit()
+                    self.click.emit()
+            elif e.button() == Qt.MiddleButton:
+                self.middleRelease.emit()
+                if self.middleClickOnRelease:
+                    self.middleClick.emit()
+                    self.click.emit()
         elif prm == 'm':
             buttonDown = False
             if self.leftDown:
+                self.leftClickOnRelease = False
                 self.leftDrag.emit()
                 self.drag.emit()
                 buttonDown = True
             if self.rightDown:
+                self.rightClickOnRelease = False
                 self.rightDrag.emit()
                 self.drag.emit()
                 buttonDown = True
             if self.middleDown:
+                self.middleClickOnRelease = False
                 self.middleDrag.emit()
                 self.drag.emit()
                 buttonDown = True

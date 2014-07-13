@@ -11,6 +11,9 @@ class BridgeConceptGraph:
         self.ForwardEdges = {}
         self.ReverseEdges = {}
 
+    def Nodes(self):
+        return self.bridges.values() + self.concepts.values()
+        
     def AddBridge(self,bridge):
         k = self.GetNextKey()
         self.bridges[k] = bridge

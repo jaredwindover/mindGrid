@@ -9,26 +9,32 @@ class Node:
     def __init__(self,
                  title = DEFAULT_TITLE,
                  text = DEFAULT_TEXT,
-                 qcb=QColor('white'),
-                 qch=QColor('black'),
+                 qcp=[QColor('white'),
+                      QColor('black'),
+                      QColor('red'),
+                      QColor('green')],
                  radius=DEFAULT_RADIUS
     ):
         self.title = QString(title)
         self.text = QTextDocument(text)
         self.position = QPointF(0,0)
         self.highlighted = False
-        self.baseColor = qcb
-        self.highlightColor = qch
+        self.palette = qcp
         self.radius = radius
+        self.held = False
+        self.hovered = False
+        self.selected = False
 
 class Bridge(Node):
     def __init__(self):
         Node.__init__(self,
                       'Default Bridge',
                       DEFAULT_TEXT,
-                      QColor(0,255,255),
-                      QColor(0,255,0),
-                      30
+                      [QColor(225,0,0),
+                       QColor(150,0,0),
+                       QColor('white'),
+                       QColor(75,0,0)],
+                      10
         )
     
 class Concept(Node):
@@ -36,7 +42,9 @@ class Concept(Node):
         Node.__init__(self,
                       'Default Concept',
                       DEFAULT_TEXT,
-                      QColor(255,0,255),
-                      QColor(255,0,0),
-                      30
+                      [QColor(0,0,225),
+                       QColor(0,0,150),
+                       QColor('white'),
+                       QColor(0,0,75)],
+                      15
         )
