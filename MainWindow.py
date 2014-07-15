@@ -23,6 +23,7 @@ class MainWindow(QWidget):
         self.vLayout2a.addWidget(self.nodeContent)
 
         self.updateButton = QPushButton("Update")
+        self.updateButton.clicked.connect(self.onUpdate)
         self.vLayout2b.addWidget(self.updateButton)
 
         #Composing Bottom Gui
@@ -31,7 +32,27 @@ class MainWindow(QWidget):
 
         #Composing Final Layout
         self.viewingWindow = ViewingWindow(self)
+        self.viewingWindow.nodeSelected.connect(self.updateText)
         self.vLayout0.addWidget(self.viewingWindow)
         self.vLayout0.addLayout(self.hLayout1a)
 
         self.setLayout(self.vLayout0)
+
+    def updateText(self):
+        try:
+            title = self.viewingWindow.selectedNode.title
+            text = self.viewingWindow.selectedNode.text
+            self.nodeTitle.setText(title)
+            self.nodeContent.setDocument(text)
+        except:
+            print "We had an error"
+            print title
+            print text
+            pass
+        
+    def onUpdate(self):
+        node = self.viewingWindow.selectedNode
+        text = self.nodeContent.document()
+        title = self.nodeTitle.text()
+        node.title = title
+        node.text = text

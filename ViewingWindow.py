@@ -4,12 +4,14 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from BridgeConceptGraph import BridgeConceptGraph
 from cursor import Cursor
+from SignalSlotObject import SignalSlotObject
 from Utility import *
 
 class ViewingWindow(QWidget):
     def __init__(self,*args):
         super(ViewingWindow,self).__init__(*args)
         self.graph = BridgeConceptGraph()
+        self.nodeSelected = SignalSlotObject()
         self.cursor = Cursor()
         self.cursor.leftClick.connect(self.onLeftClick)
         self.cursor.hover.connect(self.onHover)
@@ -181,9 +183,9 @@ class ViewingWindow(QWidget):
 
     def update(self):
         self.readCursorEvents()
-        print "Held Node: ",self.heldNode
-        print "Selected Node: ",self.selectedNode
-        print "Hovered Node: ",self.hoverNode
+        #print "Held Node: ",self.heldNode
+        #print "Selected Node: ",self.selectedNode
+        #print "Hovered Node: ",self.hoverNode
         self.repaint()
 
     def animate(self):
@@ -194,6 +196,7 @@ class ViewingWindow(QWidget):
     def select(self,node):
         self.selectedNode = node
         self.selectedNode.selected = True
+        self.nodeSelected.emit()
 
     def unselect(self):
         try:
@@ -224,3 +227,4 @@ class ViewingWindow(QWidget):
             self.hoverNode = None
         except:
             pass
+

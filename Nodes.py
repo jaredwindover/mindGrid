@@ -16,7 +16,7 @@ class Node:
                  radius=DEFAULT_RADIUS
     ):
         self.title = QString(title)
-        self.text = QTextDocument(text)
+        self.text = QTextDocument(QString(text))
         self.position = QPointF(0,0)
         self.highlighted = False
         self.palette = qcp
