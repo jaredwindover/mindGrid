@@ -17,7 +17,7 @@ class ViewingWindow(QWidget):
         self.nodeSelected = SignalSlotObject()
         self.cursor = Cursor()
         self.cursor.leftClick.connect(self.onLeftClick)
-        self.cursor.hover.connect(self.onHover)
+        self.cursor.leftHover.connect(self.onHover)
         self.cursor.leftDrag.connect(self.onLeftDrag)
         self.cursor.leftPress.connect(self.onLeftPress)
         self.cursor.leftRelease.connect(self.onLeftRelease)
@@ -25,18 +25,22 @@ class ViewingWindow(QWidget):
         self.cursor.rightDrag.connect(self.onRightDrag)
         self.cursor.rightPress.connect(self.onRightPress)
         self.cursor.rightRelease.connect(self.onRightRelease)
+        self.cursor.rightPull.connect(self.onRightPull)
+        self.cursor.rightHover.connect(self.onHover)
         self.leftClickB = False
         self.leftDragB = False
-        self.leftHoverB = False
+        self.HoverB = False
         self.leftPressB = False
         self.leftReleaseB = False
         self.rightClickB = False
         self.rightDragB = False
         self.rightPressB = False
         self.rightReleaseB = False
+        self.rightPullB = False
         self.selectedNode = None
         self.heldNode = None
         self.hoverNode = None
+        self.edgeDragNode = None
         self.fps = 30
         self.initUI()
 
@@ -58,7 +62,28 @@ class ViewingWindow(QWidget):
         qp.begin(self)
         qp.setRenderHint(QPainter.Antialiasing)
         self.drawGraph(qp)
+        self.drawUI(qp)
         qp.end()
+
+    def drawUI(self,qp):
+        pen = QPen()
+        brush = QBrush(QColor(0,100,0,200))
+        qp.setPen(pen)
+        qp.setBrush(brush)
+        if self.edgeDragNode != None:
+            qp.drawPath(
+                getArrowPath(self.edgeDragNode.position,
+                             QPointF(self.cursor.x,
+                                     self.cursor.y),
+                             4,
+                             40,
+                             20,
+                             pi/3,
+                             0,
+                             0
+                         )
+            )
+            
 
     def drawGraph(self, qp):
         for index, concept in self.graph.concepts.items():
@@ -137,7 +162,7 @@ class ViewingWindow(QWidget):
         self.leftDragB = True
         
     def onHover(self):
-        self.leftHoverB = True
+        self.HoverB = True
 
     def onLeftPress(self):
         self.leftPressB = True
@@ -156,6 +181,9 @@ class ViewingWindow(QWidget):
 
     def onRightRelease(self):
         self.rightReleaseB = True
+
+    def onRightPull(self):
+        self.rightPullB = True
 
     def getClosestNode(self,pos):
         try:
@@ -178,11 +206,10 @@ class ViewingWindow(QWidget):
                 pass
             self.leftDragB = False
             
-        if (self.leftHoverB):
+        if (self.HoverB):
             if node == None: pass
             elif (dist < node.radius):
                 self.unhover()
-                self.unhold()
                 self.hover(node)
             else:
                 self.unhover()
@@ -222,6 +249,17 @@ class ViewingWindow(QWidget):
                 self.addConcept(pos)
             self.rightClickB = False
 
+        if (self.rightPullB):
+            if node == None:
+                pass
+            elif dist < node.radius:
+                self.edgeDragNode = node
+            elif self.selectedNode != None:
+                self.edgeDragNode = self.selectedNode
+            else:
+                pass
+            self.rightPullB = False
+                
         if (self.rightDragB):
             pass
             
@@ -229,7 +267,24 @@ class ViewingWindow(QWidget):
             pass
 
         if (self.rightReleaseB):
-            pass
+            if self.edgeDragNode != None and self.edgeDragNode != node:
+                if dist < node.radius:
+                    if isinstance(self.edgeDragNode,Bridge):
+                        if isinstance(node,Concept):
+                            self.graph.ConnectBridgeToConcept(
+                                self.edgeDragNode.key,
+                                node.key)
+                    elif isinstance(self.edgeDragNode,Concept):
+                        if isinstance(node,Bridge):
+                            self.graph.ConnectConceptToBridge(
+                                self.edgeDragNode.key,
+                                node.key)
+                        elif isinstance(node,Concept):
+                            k =self.addBridge((pos + self.edgeDragNode.position)/2)
+                            self.graph.ConnectConceptToBridge(self.edgeDragNode.key,k)
+                            self.graph.ConnectBridgeToConcept(k,node.key)
+            self.edgeDragNode = None
+            self.rightReleaseB = False
 
     def update(self):
         self.readCursorEvents()
@@ -295,4 +350,11 @@ class ViewingWindow(QWidget):
         C.position = pos
         k = self.graph.AddConcept(C)
         C.key = k
+        return k
+
+    def addBridge(self,pos):
+        B = Bridge()
+        B.position = pos
+        k = self.graph.AddBridge(B)
+        B.key = k
         return k
