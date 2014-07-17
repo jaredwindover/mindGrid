@@ -1,3 +1,4 @@
+from math import pi
 from time import clock
 
 from PyQt4.QtCore import *
@@ -7,6 +8,7 @@ from cursor import Cursor
 from SignalSlotObject import SignalSlotObject
 from Utility import *
 from Nodes import Bridge,Concept
+from Arrow import getArrowPath
 
 class ViewingWindow(QWidget):
     def __init__(self,*args):
@@ -20,12 +22,18 @@ class ViewingWindow(QWidget):
         self.cursor.leftPress.connect(self.onLeftPress)
         self.cursor.leftRelease.connect(self.onLeftRelease)
         self.cursor.rightClick.connect(self.onRightClick)
+        self.cursor.rightDrag.connect(self.onRightDrag)
+        self.cursor.rightPress.connect(self.onRightPress)
+        self.cursor.rightRelease.connect(self.onRightRelease)
         self.leftClickB = False
         self.leftDragB = False
         self.leftHoverB = False
         self.leftPressB = False
         self.leftReleaseB = False
         self.rightClickB = False
+        self.rightDragB = False
+        self.rightPressB = False
+        self.rightReleaseB = False
         self.selectedNode = None
         self.heldNode = None
         self.hoverNode = None
@@ -53,34 +61,38 @@ class ViewingWindow(QWidget):
         qp.end()
 
     def drawGraph(self, qp):
-        for index, bridge in self.graph.bridges.items():
-            self.drawBridgeToConceptEdges(qp,
-                                          bridge,
-                                          self.graph.ForwardEdges[index])
         for index, concept in self.graph.concepts.items():
             self.drawConceptToBridgeEdges(qp,
                                           concept,
                                           self.graph.ForwardEdges[index])
-        for index in self.graph.bridges:
-            self.drawBridge(qp,self.graph.bridges[index])
+        for index, bridge in self.graph.bridges.items():
+            self.drawBridgeToConceptEdges(qp,
+                                          bridge,
+                                          self.graph.ForwardEdges[index])
         for index in self.graph.concepts:
             self.drawConcept(qp,self.graph.concepts[index])
+        for index in self.graph.bridges:
+            self.drawBridge(qp,self.graph.bridges[index])
 
     def drawBridgeToConceptEdges(self,qp,bridge,edges):
         pen = QPen()
-        brush = QBrush()
+        brush = QBrush(QColor(100,0,0,200))
         qp.setPen(pen)
         qp.setBrush(brush)
         for e in edges:
-            qp.drawLine(bridge.position,self.graph.concepts[e].position)
+            qp.drawPath(
+                getArrowPath(bridge.position,
+                             self.graph.concepts[e].position,10,65,30, pi/3,0,self.graph.concepts[e].radius))
             
     def drawConceptToBridgeEdges(self,qp,concept,edges):
         pen = QPen()
-        brush = QBrush()
+        brush = QBrush(QColor(0,0,100,200))
         qp.setPen(pen)
         qp.setBrush(brush)
         for e in edges:
-            qp.drawLine(concept.position,self.graph.bridges[e].position)
+            qp.drawPath(
+                getArrowPath(concept.position,
+                             self.graph.bridges[e].position,6,40,20, pi/3,0,self.graph.bridges[e].radius))
             
     def drawBridge(self,qp,bridge):
         self.drawNode(qp,bridge)
@@ -135,6 +147,15 @@ class ViewingWindow(QWidget):
 
     def onRightClick(self):
         self.rightClickB = True
+
+    def onRightDrag(self):
+        self.rightDragB = True
+
+    def onRightPress(self):
+        self.rightPressB = True
+
+    def onRightRelease(self):
+        self.rightReleaseB = True
 
     def getClosestNode(self,pos):
         try:
@@ -200,6 +221,15 @@ class ViewingWindow(QWidget):
             else:
                 self.addConcept(pos)
             self.rightClickB = False
+
+        if (self.rightDragB):
+            pass
+            
+        if (self.rightPressB):
+            pass
+
+        if (self.rightReleaseB):
+            pass
 
     def update(self):
         self.readCursorEvents()

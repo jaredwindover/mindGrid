@@ -1,4 +1,6 @@
 from math import sin, cos, atan2, degrees, pi, sqrt
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 def ltIndex(i):
     def lti(a,b):
