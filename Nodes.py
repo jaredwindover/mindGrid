@@ -24,6 +24,7 @@ class Node:
         self.held = False
         self.hovered = False
         self.selected = False
+        self.key = None
 
 class Bridge(Node):
     def __init__(self):

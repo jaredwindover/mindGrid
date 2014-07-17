@@ -6,6 +6,7 @@ from BridgeConceptGraph import BridgeConceptGraph
 from cursor import Cursor
 from SignalSlotObject import SignalSlotObject
 from Utility import *
+from Nodes import Bridge,Concept
 
 class ViewingWindow(QWidget):
     def __init__(self,*args):
@@ -18,11 +19,13 @@ class ViewingWindow(QWidget):
         self.cursor.leftDrag.connect(self.onLeftDrag)
         self.cursor.leftPress.connect(self.onLeftPress)
         self.cursor.leftRelease.connect(self.onLeftRelease)
+        self.cursor.rightClick.connect(self.onRightClick)
         self.leftClickB = False
         self.leftDragB = False
         self.leftHoverB = False
         self.leftPressB = False
         self.leftReleaseB = False
+        self.rightClickB = False
         self.selectedNode = None
         self.heldNode = None
         self.hoverNode = None
@@ -130,11 +133,17 @@ class ViewingWindow(QWidget):
     def onLeftRelease(self):
         self.leftReleaseB = True
 
+    def onRightClick(self):
+        self.rightClickB = True
+
     def getClosestNode(self,pos):
-        G = self.graph
-        distances=[(node,norm(pos - node.position)) for node in G.Nodes()]
-        r = reduce(ltIndex(1),distances)
-        return r
+        try:
+            G = self.graph
+            distances=[(node,norm(pos - node.position)) for node in G.Nodes()]
+            r = reduce(ltIndex(1),distances)
+            return r
+        except:
+            return (None,None)
         
     def readCursorEvents(self):
         pos = QPointF(self.cursor.x,self.cursor.y)
@@ -149,7 +158,8 @@ class ViewingWindow(QWidget):
             self.leftDragB = False
             
         if (self.leftHoverB):
-            if (dist < node.radius):
+            if node == None: pass
+            elif (dist < node.radius):
                 self.unhover()
                 self.unhold()
                 self.hover(node)
@@ -158,7 +168,8 @@ class ViewingWindow(QWidget):
             self.leftHoverB = False
             
         if (self.leftPressB):
-            if (dist < node.radius):
+            if node == None: pass
+            elif (dist < node.radius):
                 self.unhold()
                 self.unhover()
                 self.hold(node)
@@ -169,7 +180,8 @@ class ViewingWindow(QWidget):
             self.leftReleaseB = False
             
         if (self.leftClickB):
-            if (dist < node.radius):
+            if node == None: pass
+            elif (dist < node.radius):
                 self.unhover()
                 self.unhold()
                 if not self.selectedNode == node:
@@ -180,6 +192,14 @@ class ViewingWindow(QWidget):
             else:
                 self.unselect()
             self.leftClickB = False
+
+        if (self.rightClickB):
+            if node == None: self.addConcept(pos)
+            elif (dist < node.radius):
+                self.deleteNode(node)
+            else:
+                self.addConcept(pos)
+            self.rightClickB = False
 
     def update(self):
         self.readCursorEvents()
@@ -198,33 +218,51 @@ class ViewingWindow(QWidget):
         self.selectedNode.selected = True
         self.nodeSelected.emit()
 
-    def unselect(self):
-        try:
-            self.selectedNode.selected = False
-            self.selectedNode = None
-        except:
-            pass
+    def unselect(self,node=None):
+        if self.selectedNode == node or node == None:
+            try:
+                self.selectedNode.selected = False
+                self.selectedNode = None
+            except:
+                pass
 
     def hold(self, node):
         self.heldNode = node
         self.heldNode.held = True
 
-    def unhold(self):
-        try:
-            self.heldNode.held = False
-            self.heldNode = None
-        except:
-            pass
-
+    def unhold(self, node=None):
+        if self.heldNode == node or node == None:
+            try:
+                self.heldNode.held = False
+                self.heldNode = None
+            except:
+                pass
+            
     def hover(self,node):
         self.hoverNode = node
         self.hoverNode.hovered = True
         
 
-    def unhover(self):
-        try:
-            self.hoverNode.hovered = False
-            self.hoverNode = None
-        except:
-            pass
+    def unhover(self, node=None):
+        if self.hoverNode == node or node == None:
+            try:
+                self.hoverNode.hovered = False
+                self.hoverNode = None
+            except:
+                pass
 
+    def deleteNode(self,node):
+        self.unselect(node)
+        self.unhold(node)
+        self.unhover(node)
+        try:
+            self.graph.RemoveBridge(node.key)
+        except:
+            self.graph.RemoveConcept(node.key)
+
+    def addConcept(self,pos):
+        C = Concept()
+        C.position = pos
+        k = self.graph.AddConcept(C)
+        C.key = k
+        return k

@@ -51,8 +51,11 @@ class MainWindow(QWidget):
             pass
         
     def onUpdate(self):
-        node = self.viewingWindow.selectedNode
-        text = self.nodeContent.document()
-        title = self.nodeTitle.text()
-        node.title = title
-        node.text = text
+        try:
+            node = self.viewingWindow.selectedNode
+            text = self.nodeContent.document()
+            title = self.nodeTitle.text()
+            node.title = title
+            node.text = text
+        except:
+            pass
