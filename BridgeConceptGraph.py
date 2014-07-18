@@ -37,10 +37,15 @@ class BridgeConceptGraph:
             return k
 
     def ConnectBridgeToConcept(self, iBridge, iConcept):
-        self.ForwardEdges[iBridge].append(iConcept)
+        if self.ConceptConnectsTo(iConcept,iBridge):
+            self.DisconnectConceptFromBridge(iConcept,iBridge)
+        self.ForwardEdges[iBridge] = [iConcept]
         self.ReverseEdges[iConcept].append(iBridge)
+            
 
     def ConnectConceptToBridge(self,iConcept,iBridge):
+        if self.BridgeConnectsTo(iBridge,iConcept):
+            self.DisconnectBridgeFromConcept(iBridge,iConcept)
         self.ForwardEdges[iConcept].append(iBridge)
         self.ReverseEdges[iBridge].append(iConcept)
 
@@ -51,6 +56,15 @@ class BridgeConceptGraph:
     def DisconnectConceptFromBridge(self,iConcept,iBridge):
         self.ForwardEdges[iConcept].remove(iBridge)
         self.ReverseEdges[iBridge].remove(iConcept)
+
+    def BridgeConnectsTo(self,iBridge,key):
+        return self.NodeConnectsTo(iBridge,key)
+
+    def ConceptConnectsTo(self,iConcept,key):
+        return self.NodeConnectsTo(iConcept,key)
+
+    def NodeConnectsTo(self,iNode,key):
+        return key in self.ForwardEdges[iNode]
         
     def RemoveBridge(self,iBridge):
         del self.bridges[iBridge]
