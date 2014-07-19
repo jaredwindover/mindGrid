@@ -83,7 +83,6 @@ class ViewingWindow(QWidget):
                              0
                          )
             )
-            
 
     def drawGraph(self, qp):
         for index, concept in self.graph.concepts.items():
@@ -121,9 +120,29 @@ class ViewingWindow(QWidget):
             
     def drawBridge(self,qp,bridge):
         self.drawNode(qp,bridge)
+        pen = QPen(QColor(0,0,0))
+        font = QFont()
+        font.setItalic(True)
+        font.setBold(True)
+        qp.setPen(pen)
+        qp.setFont(font)
+        bTitle = bridge.title
+        pos = bridge.position + QPointF(1,-1)*bridge.radius
+        qp.drawText(pos,bTitle)
         
     def drawConcept(self,qp,concept):
         self.drawNode(qp,concept)
+        pen = QPen(QColor(0,0,0))
+        bgBrush = QBrush(QColor(255,255,255,20))
+        font = QFont()
+        font.setBold(True)
+        qp.setPen(pen)
+        qp.setFont(font)
+        qp.setBackgroundMode(Qt.OpaqueMode)
+        qp.setBackground(bgBrush)
+        cTitle = concept.title
+        pos = concept.position + QPointF(1,-1)*concept.radius
+        qp.drawText(pos,cTitle)
 
     def drawNode(self,qp,node):
         if node.selected:
