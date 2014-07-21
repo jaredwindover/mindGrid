@@ -1,5 +1,6 @@
 from math import pi
 from time import clock
+from pickle import dump, load
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -345,7 +346,6 @@ class ViewingWindow(QWidget):
     def hover(self,node):
         self.hoverNode = node
         self.hoverNode.hovered = True
-        
 
     def unhover(self, node=None):
         if self.hoverNode == node or node == None:
@@ -377,3 +377,13 @@ class ViewingWindow(QWidget):
         k = self.graph.AddBridge(B)
         B.key = k
         return k
+
+    def writeTo(self, filename):
+        f = open(filename,'w')
+        dump(self.graph,f)
+        f.close()
+
+    def readFrom(self,filename):
+        f = open(str(filename),'r')
+        self.graph = load(f)
+        f.close()

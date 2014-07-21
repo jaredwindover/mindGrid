@@ -1,30 +1,28 @@
 import sys
+import copy_reg
 from MainWindow import MainWindow
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from Nodes import *
 
 def main():
+    #Add this so we can pickle QTextDocuments
+    copy_reg.pickle(QTextDocument,pickle_QtD,unpickle_QtD)
     app = QApplication(sys.argv)
     mainWindow = MainWindow()
     mainWindow.setWindowTitle("WireFrame Model")
-    G = mainWindow.viewingWindow.graph
-    B = Bridge()
-    B.position = QPointF(100,100)
-    b0 = G.AddBridge(B)
-    B.key = b0
-    v = mainWindow.viewingWindow
-    c0 = v.addConcept(QPointF(200,200))
-    c1 = v.addConcept(QPointF(200,250))
-    c2 = v.addConcept(QPointF(250,200))
-    c3 = v.addConcept(QPointF(250,250))
-    G.ConnectBridgeToConcept(b0,c0)
-    G.ConnectConceptToBridge(c1,b0)
-    G.ConnectConceptToBridge(c2,b0)
-    G.ConnectConceptToBridge(c3,b0)
     mainWindow.show()
-    mainWindow.viewingWindow.animate()
+    mainWindow.centralWidget().viewingWindow.animate()
     app.exec_()
 
+
+def pickle_QtD(qtd):
+    return QTextDocument, (qtd.toPlainText(),)
+
+def unpickle_QtD(tup):
+    re = QTextDocument()
+    re.setPlainText(tup[0])
+    return re
+    
 if __name__ == '__main__':
     main()

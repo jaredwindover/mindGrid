@@ -3,10 +3,66 @@ from PyQt4.QtGui import *
 from ViewingWindow import ViewingWindow
 
 
-class MainWindow(QWidget):
-
+class MainWindow(QMainWindow):
     def __init__(self,*args):
         super(MainWindow,self).__init__(*args)
+        self.initUI()
+        self.fileName = None
+
+    def initUI(self):
+        self.setCentralWidget(MainWidget())
+        menuBar = self.menuBar()
+        fileMenu = menuBar.addMenu('&File')
+
+        saveAction = QAction('&save',self)
+        saveAction.triggered.connect(self.save)
+        fileMenu.addAction(saveAction)
+
+        saveAsAction = QAction('&Save as',self)
+        saveAsAction.triggered.connect(self.saveAs)
+        fileMenu.addAction(saveAsAction)
+
+        openAction = QAction('&open',self)
+        openAction.triggered.connect(self.open)
+        fileMenu.addAction(openAction)
+        
+        exitAction = QAction('&exit',self)
+        exitAction.triggered.connect(qApp.quit)
+        fileMenu.addAction(exitAction)
+
+    def open(self):
+        try:
+            fileName = QFileDialog.getOpenFileName(self)
+            self.readFrom(fileName)
+        except:
+            print "Error opening file"
+
+    def save(self):
+        try:
+            if self.fileName == None:
+                self.saveAs()
+            else:
+                self.writeTo(self.fileName)
+        except:
+            print "Error saving file"
+
+    def saveAs(self):
+        try:
+            fileName = QFileDialog.getSaveFileName(self)
+            self.writeTo(fileName)
+        except:
+            print "Error saving file"
+
+    def readFrom(self,fileName):
+        self.centralWidget().viewingWindow.readFrom(fileName)
+
+    def writeTo(self,fileName):
+        self.centralWidget().viewingWindow.writeTo(fileName)
+
+class MainWidget(QWidget):
+
+    def __init__(self,*args):
+        super(MainWidget,self).__init__(*args)
         self.initUI()
 
     def initUI(self):
