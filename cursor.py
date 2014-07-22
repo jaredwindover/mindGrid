@@ -13,6 +13,7 @@ class Cursor():
         self.y = 0
         self._px = 0
         self._py = 0
+        self.resetPrevious = False
         self.leftDown = False
         self.rightDown = False
         self.middleDown = False
@@ -45,14 +46,12 @@ class Cursor():
         self.drag = SignalSlotObject()
         
     def setX(self,a):
-        if self.x != a:
-            self._px = self.x
-            self.x = a
+        if (self.resetPrevious): self._px = self.x
+        self.x = a
 
     def setY(self,a):
-        if self.y != a:
-            self._py = self.y
-            self.y = a
+        if (self.resetPrevious): self._py = self.y
+        self.y = a
 
     def setButtons(self,b):
         b = int(b)
@@ -68,6 +67,7 @@ class Cursor():
     def update(self,e,prm='o'):
         self.setX(e.x())
         self.setY(e.y())
+        self.resetPrevious = False
         self.setButtons(e.buttons())
         
         if prm == 'p':

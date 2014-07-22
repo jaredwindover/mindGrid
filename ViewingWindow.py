@@ -28,6 +28,7 @@ class ViewingWindow(QWidget):
         self.cursor.rightRelease.connect(self.onRightRelease)
         self.cursor.rightPull.connect(self.onRightPull)
         self.cursor.rightHover.connect(self.onHover)
+        self.worldCursor = QPointF(0,0)
         self.leftClickB = False
         self.leftDragB = False
         self.HoverB = False
@@ -43,6 +44,10 @@ class ViewingWindow(QWidget):
         self.hoverNode = None
         self.edgeDragNode = None
         self.fps = 30
+        self.translation = QPointF(0.0,0.0)
+        self.scale = 1.0
+        self.minScale = 0.1
+        self.maxScale = 10.0
         self.initUI()
 
     def initUI(self):
@@ -61,10 +66,24 @@ class ViewingWindow(QWidget):
     def paintEvent(self,event):
         qp = QPainter()
         qp.begin(self)
+        qp.scale(self.scale,self.scale)
+        qp.translate(self.translation)
         qp.setRenderHint(QPainter.Antialiasing)
         self.drawGraph(qp)
         self.drawUI(qp)
         qp.end()
+
+    def wheelEvent(self,event):
+        self.cursor.update(event,'o')
+        d = float(event.delta())
+        self.updateWorldCursor()
+        p = self.worldCursor
+        oldScale = self.scale
+        oldTranslation = self.translation
+        self.scale += d/360
+        self.scale = min(self.maxScale,self.scale)
+        self.scale = max(self.minScale,self.scale)
+        self.translation=((self.translation+p)*(oldScale/self.scale))-p
 
     def drawUI(self,qp):
         pen = QPen()
@@ -84,6 +103,14 @@ class ViewingWindow(QWidget):
                              0
                          )
             )
+        #qp.drawText(0,20,str(self.translation))
+        #qp.drawText(0,50,str(self.cursor.x)+','+str(self.cursor.y))
+        #qp.drawText(0,110,str(self.scale))
+        #qp.drawEllipse(QPointF(0,0),10,10)
+        #qp.drawEllipse(QPointF(0,100),10,10)
+        #qp.drawEllipse(QPointF(100,100),10,10)
+        #qp.drawEllipse(QPointF(100,0),10,10)
+        #print self.scale
 
     def drawGraph(self, qp):
         for index, concept in self.graph.concepts.items():
@@ -123,6 +150,7 @@ class ViewingWindow(QWidget):
         self.drawNode(qp,bridge)
         pen = QPen(QColor(0,0,0))
         font = QFont()
+        font.setPointSizeF(12.0/(self.scale**(3.0/4)))
         font.setItalic(True)
         font.setBold(True)
         qp.setPen(pen)
@@ -136,6 +164,7 @@ class ViewingWindow(QWidget):
         pen = QPen(QColor(0,0,0))
         bgBrush = QBrush(QColor(255,255,255,20))
         font = QFont()
+        font.setPointSizeF(12.0/(self.scale**(3.0/4)))
         font.setBold(True)
         qp.setPen(pen)
         qp.setFont(font)
@@ -213,9 +242,21 @@ class ViewingWindow(QWidget):
             return r
         except:
             return (None,None)
-        
+
+    def updateWorldCursor(self):
+        c = self.cursor
+        s = QPointF(self.scale,self.scale)
+        t = self.translation
+        self.worldCursor = QPointF((c.x/s.x())-t.x(),(c.y/s.y())-t.y())
+            
     def readCursorEvents(self):
-        pos = QPointF(self.cursor.x,self.cursor.y)
+        c = self.cursor
+        self.cursor.resetPrevious = True
+        s = QPointF(self.scale,self.scale)
+        t = self.translation
+        self.updateWorldCursor()
+        pos = self.worldCursor
+        prevPos = QPointF((c._px/s.x())-t.x(),(c._py/s.y())-t.y())
         (node,dist) = self.getClosestNode(pos)
         #Due to the ascynchronous design, it's necessary to order these
         #properly
@@ -223,7 +264,7 @@ class ViewingWindow(QWidget):
             try:
                 self.heldNode.position = pos
             except:
-                pass
+                self.translation += pos - prevPos
             self.leftDragB = False
             
         if (self.HoverB):
