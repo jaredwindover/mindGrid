@@ -32,10 +32,11 @@ class MainWindow(QMainWindow):
 
     def open(self):
         try:
-            fileName = QFileDialog.getOpenFileName(self)
-            self.readFrom(fileName)
+            self.fileName = QFileDialog.getOpenFileName(self)
+            self.readFrom(self.fileName)
         except:
             print "Error opening file"
+            self.fileName = None
 
     def save(self):
         try:
@@ -52,6 +53,7 @@ class MainWindow(QMainWindow):
             self.writeTo(self.fileName)
         except:
             print "Error saving file"
+            self.fileName = None
 
     def readFrom(self,fileName):
         self.centralWidget().viewingWindow.readFrom(fileName)
