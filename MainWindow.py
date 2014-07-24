@@ -48,8 +48,8 @@ class MainWindow(QMainWindow):
 
     def saveAs(self):
         try:
-            fileName = QFileDialog.getSaveFileName(self)
-            self.writeTo(fileName)
+            self.fileName = QFileDialog.getSaveFileName(self)
+            self.writeTo(self.fileName)
         except:
             print "Error saving file"
 

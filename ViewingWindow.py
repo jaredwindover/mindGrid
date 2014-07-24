@@ -90,11 +90,11 @@ class ViewingWindow(QWidget):
         brush = QBrush(QColor(0,100,0,200))
         qp.setPen(pen)
         qp.setBrush(brush)
+        p = self.worldCursor
         if self.edgeDragNode != None:
             qp.drawPath(
                 getArrowPath(self.edgeDragNode.position,
-                             QPointF(self.cursor.x,
-                                     self.cursor.y),
+                             p,
                              4,
                              40,
                              20,
