@@ -91,6 +91,7 @@ class MainWidget(QWidget):
         #Composing Final Layout
         self.viewingWindow = ViewingWindow(self)
         self.viewingWindow.nodeSelected.connect(self.updateText)
+        self.viewingWindow.nodeUnselected.connect(self.onUnselect)
         self.vLayout0.addWidget(self.viewingWindow)
         self.vLayout0.addLayout(self.hLayout1a)
 
@@ -102,6 +103,7 @@ class MainWidget(QWidget):
             text = self.viewingWindow.selectedNode.text
             self.nodeTitle.setText(title)
             self.nodeContent.setDocument(text)
+            self.nodeTitle.setFocus()
         except:
             print "We had an error"
             print title
@@ -115,5 +117,12 @@ class MainWidget(QWidget):
             title = self.nodeTitle.text()
             node.title = title
             node.text = text
+        except:
+            pass
+
+    def onUnselect(self):
+        try:
+            self.nodeTitle.setText(QString())
+            self.nodeContent.setPlainText(QString())
         except:
             pass

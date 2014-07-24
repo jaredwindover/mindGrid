@@ -16,6 +16,7 @@ class ViewingWindow(QWidget):
         super(ViewingWindow,self).__init__(*args)
         self.graph = BridgeConceptGraph()
         self.nodeSelected = SignalSlotObject()
+        self.nodeUnselected = SignalSlotObject()
         self.cursor = Cursor()
         self.cursor.leftClick.connect(self.onLeftClick)
         self.cursor.leftHover.connect(self.onHover)
@@ -175,6 +176,8 @@ class ViewingWindow(QWidget):
         qp.drawText(pos,cTitle)
 
     def drawNode(self,qp,node):
+        ring = False
+        ringRadius = 5
         if node.selected:
             pen = QPen(node.palette[2])
             brush = QBrush(node.palette[2])
@@ -184,12 +187,24 @@ class ViewingWindow(QWidget):
         elif node.hovered:
             pen = QPen(node.palette[1])
             brush = QBrush(node.palette[1])
+        elif node.highlighted:
+            ring = True
+            pen = QPen(node.palette[3])
+            brush = QBrush(node.palette[3])
         else:
             pen = QPen(node.palette[3])
             brush = QBrush(node.palette[3])
         qp.setPen(pen)
         qp.setBrush(brush)
         qp.drawEllipse(node.position,node.radius,node.radius)
+        if ring:
+            pen = QPen(node.palette[2])
+            brush = QBrush()
+            qp.setPen(pen)
+            qp.setBrush(brush)
+            qp.drawEllipse(node.position,\
+                           node.radius + ringRadius,\
+                           node.radius + ringRadius)
         
 
     def setGraph(self,graph):
@@ -362,13 +377,24 @@ class ViewingWindow(QWidget):
     def select(self,node):
         self.selectedNode = node
         self.selectedNode.selected = True
+        for pn in self.graph.ReverseEdges[node.key]:
+            try:
+                self.graph.bridges[pn].highlighted = True
+            except:
+                self.graph.concepts[pn].highlighted = True
         self.nodeSelected.emit()
 
     def unselect(self,node=None):
         if self.selectedNode == node or node == None:
             try:
                 self.selectedNode.selected = False
+                for pn in self.graph.ReverseEdges[self.selectedNode.key]:
+                    try:
+                        self.graph.bridges[pn].highlighted = False
+                    except:
+                        self.graph.concepts[pn].highlighted = False
                 self.selectedNode = None
+                self.nodeUnselected.emit()
             except:
                 pass
 

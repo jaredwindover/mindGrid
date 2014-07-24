@@ -12,7 +12,8 @@ class Node:
                  qcp=[QColor('white'),
                       QColor('black'),
                       QColor('red'),
-                      QColor('green')],
+                      QColor('green')
+                  ],
                  radius=DEFAULT_RADIUS
     ):
         self.title = QString(title)
@@ -26,6 +27,7 @@ class Node:
         self.selected = False
         self.key = None
 
+
 class Bridge(Node):
     def __init__(self):
         Node.__init__(self,
@@ -34,7 +36,8 @@ class Bridge(Node):
                       [QColor(225,0,0),
                        QColor(150,0,0),
                        QColor('white'),
-                       QColor(75,0,0)],
+                       QColor(75,0,0)
+                   ],
                       10
         )
     
@@ -46,6 +49,7 @@ class Concept(Node):
                       [QColor(0,0,225),
                        QColor(0,0,150),
                        QColor('white'),
-                       QColor(0,0,75)],
+                       QColor(0,0,75)
+                   ],
                       15
         )
