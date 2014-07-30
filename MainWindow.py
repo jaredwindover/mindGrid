@@ -123,6 +123,6 @@ class MainWidget(QWidget):
     def onUnselect(self):
         try:
             self.nodeTitle.setText(QString())
-            self.nodeContent.setPlainText(QString())
+            self.nodeContent.setDocument(QTextDocument(QString()))
         except:
             pass
